@@ -29,7 +29,7 @@ translate = (0.0, 0.0)  # amount by which to translate images
 # Image
 
 imageDir = 'images'
-imageFilename = 'ecg-02.png'
+imageFilename = 'ecg-02c.png'
 imagePath = os.path.join(imageDir, imageFilename)
 
 image = None  # the image as a 2D np.array
@@ -135,8 +135,7 @@ def compute():
     # lines = [ (angle1,distance1), (angle2,distance2) ]
 
     print '4. finding angles and distances of grid lines'
-    
-    lines = [[1, 2], [3, 4]]
+
     #cluster the graph into A, B, C, D zones
     mid_coordinate = [rows/2, columns/2]
     a_zone_x,a_zone_y, b_zone_x, b_zone_y = [], [], [], []
@@ -146,7 +145,7 @@ def compute():
         if point[0] <= mid_coordinate[0] and point[1] <= mid_coordinate[1]:
             a_zone_x.append(point[0])
             a_zone_y.append(point[1])
-        #locates points in A zone
+        #locates points in B zone
         elif point[0] >= mid_coordinate[0] and point[1] <= mid_coordinate[1]:
             b_zone_x.append(point[0])
             b_zone_y.append(point[1])
@@ -154,12 +153,22 @@ def compute():
     b_fit = np.polyfit(b_zone_x, b_zone_y, 1)
     
     angle1 = (math.atan(abs(a_fit[0]))) * 180 / 3.1415
+    #distance1 = 9999
     distance1 = math.sqrt(a_zone_x[0]**2 + a_zone_y[0]**2)
+    #for i in xrange(len(a_zone_x)):
+    #    temp = math.sqrt(a_zone_x[i]**2 + a_zone_y[i]**2)
+    #    if temp <= distance1:
+    #        distance1 = temp
     
-    angle2 = 90-(math.atan(abs(b_fit[0]))) * 180 / 3.1415 + 90
-    distance2 = math.sqrt(abs(b_zone_x[len(b_zone_x)-1]-rows)**2 + b_zone_y[len(b_zone_y)-1]**2)
+    angle2 = 90 - (math.atan(abs(b_fit[0]))) * 180 / 3.1415
+    #distance2 = 9999
+    distance2 = math.sqrt(abs(b_zone_x[0]-rows)**2 + b_zone_y[0]**2)
+    #for i in xrange(len(b_zone_x)):
+    #    temp = math.sqrt(abs(b_zone_x[i]-rows)**2 + b_zone_y[i]**2)
+    #    if temp <= distance2:
+    #        distance2 = temp
 
-    lines = [ (angle1,distance1), (angle2,distance2) ]
+    lines = [[angle1, distance1], [angle2, distance2]]
 
     # Convert back to spatial domain to get a grid-like image
 
