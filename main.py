@@ -29,7 +29,7 @@ translate = (0.0, 0.0)  # amount by which to translate images
 # Image
 
 imageDir = 'images'
-imageFilename = 'ecg-02c.png'
+imageFilename = 'ecg-02.png'
 imagePath = os.path.join(imageDir, imageFilename)
 
 image = None  # the image as a 2D np.array
@@ -136,6 +136,16 @@ def compute():
 
     print '4. finding angles and distances of grid lines'
 
+    '''
+    Assignment 2 outputs 
+    for ecg-01.png:
+	angle 0.0, distance 57
+	angle 90.0, distance 40
+    
+    And for ecg-02.png:
+    angle 4.3, distance 57
+	angle 98.4, distance 40'''
+
     #cluster the graph into A, B, C, D zones
     mid_coordinate = [rows/2, columns/2]
     a_zone_x,a_zone_y, b_zone_x, b_zone_y = [], [], [], []
@@ -152,7 +162,7 @@ def compute():
     a_fit = np.polyfit(a_zone_x, a_zone_y, 1)
     b_fit = np.polyfit(b_zone_x, b_zone_y, 1)
     
-    angle1 = (math.atan(abs(a_fit[0]))) * 180 / 3.1415
+    angle1 = 90 - (math.atan(abs(a_fit[0]))) * 180 / 3.1415
     #distance1 = 9999
     distance1 = math.sqrt(a_zone_x[0]**2 + a_zone_y[0]**2)
     #for i in xrange(len(a_zone_x)):
@@ -160,13 +170,12 @@ def compute():
     #    if temp <= distance1:
     #        distance1 = temp
     
-    angle2 = 90 - (math.atan(abs(b_fit[0]))) * 180 / 3.1415
-    #distance2 = 9999
-    distance2 = math.sqrt(abs(b_zone_x[0]-rows)**2 + b_zone_y[0]**2)
-    #for i in xrange(len(b_zone_x)):
-    #    temp = math.sqrt(abs(b_zone_x[i]-rows)**2 + b_zone_y[i]**2)
-    #    if temp <= distance2:
-    #        distance2 = temp
+    angle2 = 90 - (math.atan(b_fit[0])) * 180 / 3.1415
+    distance2 = 9999
+    for i in xrange(len(b_zone_x)):
+        temp = math.sqrt(abs(b_zone_x[i]-rows)**2 + b_zone_y[i]**2)
+        if temp <= distance2:
+            distance2 = temp
 
     lines = [[angle1, distance1], [angle2, distance2]]
 
