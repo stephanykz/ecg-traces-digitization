@@ -121,7 +121,8 @@ def compute():
     if gridImageFT is None:
         gridImageFT = np.zeros((height, width), dtype=np.complex_)
 
-    #store coordinates of points with non-zero maginitude
+    # Store coordinates of points with non-zero maginitude
+
     non_zeros = []
     rows = gridImageFT.shape[0]
     columns = gridImageFT.shape[1]
@@ -130,37 +131,34 @@ def compute():
             if gridImageFT[x, y] != 0:
                 non_zeros.append([x, y])
 
-    # Find (angle, distance) to each peak
-    #
-    # lines = [ (angle1,distance1), (angle2,distance2) ]
 
     print '4. finding angles and distances of grid lines'
 
-    #cluster the graph into A, B, C, D zones
+    # Cluster the graph into A, B, C, D zones
     mid_coordinate = [rows/2, columns/2]
     a_zone_x,a_zone_y, b_zone_x, b_zone_y, a_fit, b_fit = [], [], [], [], [], []
 
     for point in non_zeros:
-        #locates points in A zone
+        # locates points in A zone
         if point[0] <= mid_coordinate[0] and point[1] <= mid_coordinate[1] and point[1] != 0:
             a_zone_x.append(point[0])
             a_zone_y.append(point[1])
-        #locates points in B zone
+        # locates points in B zone
         elif point[0] >= mid_coordinate[0] and point[1] <= mid_coordinate[1]:
             b_zone_x.append(point[0])
             b_zone_y.append(point[1])
     if all(i == 0 for i in a_zone_x):
-        a_fit.append(math.tan(3.1415/2))
+        a_fit.append(math.tan(3.1415/2)) # fixing the problem that vertical lines cannot be processed in np.polyfit
         b_fit = np.polyfit(b_zone_x, b_zone_y, 1)
     else:
         a_fit = np.polyfit(a_zone_x, a_zone_y, 1)
         b_fit = np.polyfit(b_zone_x, b_zone_y, 1)
 
     angle1 = 90 - (math.atan(a_fit[0])) * 180 / 3.1415
-    distance1 = math.sqrt(abs(a_zone_x[1]-a_zone_x[2])**2 + abs(a_zone_y[1]-a_zone_y[2])**2)
+    distance1 = math.sqrt( abs(a_zone_x[1]-a_zone_x[2])**2 + abs(a_zone_y[1]-a_zone_y[2])**2 )
     
     angle2 = 90 - (math.atan(b_fit[0])) * 180 / 3.1415
-    distance2 = math.sqrt(abs(b_zone_x[1]-b_zone_x[2])**2 + abs(b_zone_y[1]-b_zone_y[2])**2)
+    distance2 = math.sqrt( abs(b_zone_x[1]-b_zone_x[2])**2 + abs(b_zone_y[1]-b_zone_y[2])**2 )
 
     lines = [[angle1, distance1], [angle2, distance2]]
 
